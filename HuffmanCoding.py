@@ -1,43 +1,48 @@
 import numpy as np
-import heapq
-
+import heapq as hq
+from collections import Counter as cntr
 class Node:
-    def __init__(self, char=None, freq=0):
+    def __init__(self, char, freq):
         self.char = char
         self.freq = freq
         self.left = None
         self.right = None
+    def __lt__(self, other):
+        return self.freq < other.freq
 
 
 
 #s is th string of words
 #ans is a map of character and code
-def HuffmanCodes(s):
-    freq = {}
-    heap = []
-    count=0
+def tree(s):
+    fr = cntr(s)
+    heap = [Node(ch, f) for ch, f in fr.items()]
+    hq.heapify(heap)
+    ans = {}
+    while(len(heap) >  1):
+        l = hq.heappop(heap)
+        r = hq.heappop(heap)
 
-    for ch in s:
-        freq[ch] = freq.get(ch, 0) + 1
+        nxt = Node(None,l.freq + r.freq)
+        nxt.left = l
+        nxt.right = r
+        hq.heappush(heap,nxt)
+    return heap[0] if heap else None
+    ##################################################333
+            
+def HuffCodes(node,curr="",temp = None):
+    if temp is None:
+        temp = {}
+
+    if node is not None:
+        if node.char is not None:
+            temp[node.char] = curr
+        HuffCodes(node.left, curr+"0",temp)
+        HuffCodes(node.right, curr+"1",temp)
+
+    return temp
 
 
-    for char, f in freq.items():
-        node = Node(char,f)
-        heapq.heappush(heap,(freq,node))
-        count+=1
-
-    while len(heap) > 1 :
-        freq1, _, left = heapq.heappop(heap)
-        freq2 , _, right = heapq.heappop(heap)
-
-        parent = Node(None,freq1+freq2)
-
-        parent.left = left
-        parent.right = right
-
-        heapq.heappush(heap,(parent.freq,count,parent))
-        count +=1
-
-    root = heap[0][2]
-
-    codes = {}
+root = tree("ieqyfuqioeiuqegtuoyweqoiuriuq3ewwgifgru3iyfgruy3gfru2qky3tr")
+codes = HuffCodes(root)
+print(codes)
